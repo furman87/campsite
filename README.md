@@ -15,10 +15,11 @@ A mobile-first campground management site written in **.NET 10 MVC**, backed by 
 
 Docker and Nginx are assumed to be installed.
 
-1. Copy the project to the server and enter it:
+1. Clone the project from GitHub and enter the deployment directory. Replace the example repository URL with your GitHub repository:
 
    ```bash
-   cd /opt/lakeside-campground
+   sudo git clone https://github.com/your-org/your-repository.git /opt/campsite
+   cd /opt/campsite
    cp .env.example .env
    chmod 600 .env
    nano .env
