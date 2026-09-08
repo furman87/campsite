@@ -1,5 +1,10 @@
 html { scroll-behavior: smooth; }
 #activities, #menu { scroll-margin-top: 18px; }
+.admin-help { margin: -4px 0 16px; color: #62665d; font-size: .84rem; }
+.menu-order-form { display: flex; align-items: end; gap: 7px; }
+.menu-order-form label { display: grid; gap: 2px; color: #716b5f; font-size: .65rem; font-weight: 700; text-transform: uppercase; }
+.menu-order-form input { width: 58px; padding: 5px; }
+.order-save { border: 0; background: var(--sand); color: var(--forest); cursor: pointer; font: inherit; padding: 6px 8px; }
 
 @media (max-width: 760px) {
   nav a:nth-child(2) { display: inline; }

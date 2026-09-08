@@ -10,7 +10,7 @@ public interface ICampRepository
     Task<List<Activity>> GetActivitiesAsync(); Task<List<MenuItem>> GetMenuAsync(); Task<List<Reservation>> GetReservationsAsync(); Task<List<Customer>> GetCustomersAsync();
     Task<int> CreateReservationAsync(BookingInput input); Task<Reservation?> GetReservationAsync(int id); Task UpdateReservationStatusAsync(int id, string status);
     Task<(int Customers, decimal PendingRevenue)> GetStatsAsync(); Task<ThemeSettings> GetThemeAsync(); Task SaveThemeAsync(ThemeSettings theme);
-    Task AddActivityAsync(Activity item); Task DeleteActivityAsync(int id); Task AddMenuItemAsync(MenuItem item); Task DeleteMenuItemAsync(int id);
+    Task AddActivityAsync(Activity item); Task DeleteActivityAsync(int id); Task AddMenuItemAsync(MenuItem item); Task UpdateMenuOrderAsync(int id, int sortOrder); Task DeleteMenuItemAsync(int id);
     Task<(int Id, string Username, string PasswordHash)?> FindAdminAsync(string username); Task SetPaymentAsync(int reservationId, string method, string status, string? transactionId);
 }
 
@@ -22,7 +22,7 @@ public sealed class CampRepository(NpgsqlDataSource dataSource) : ICampRepositor
         await using var db = await dataSource.OpenConnectionAsync(); return (await db.QueryAsync<Campsite.Models.Campsite>(sql, new { checkIn, checkOut, guests })).AsList();
     }
     public async Task<List<Activity>> GetActivitiesAsync() { await using var db = await dataSource.OpenConnectionAsync(); return (await db.QueryAsync<Activity>("SELECT id,title,description,starts_at AS StartsAt,location FROM activities WHERE starts_at >= now() - interval '1 day' ORDER BY starts_at LIMIT 12")).AsList(); }
-    public async Task<List<MenuItem>> GetMenuAsync() { await using var db = await dataSource.OpenConnectionAsync(); return (await db.QueryAsync<MenuItem>("SELECT id,category,name,description,price,is_available AS IsAvailable FROM menu_items WHERE is_available ORDER BY category,name")).AsList(); }
+    public async Task<List<MenuItem>> GetMenuAsync() { await using var db = await dataSource.OpenConnectionAsync(); return (await db.QueryAsync<MenuItem>("SELECT id,category,name,description,price,sort_order AS SortOrder,is_available AS IsAvailable FROM menu_items WHERE is_available ORDER BY sort_order,category,name")).AsList(); }
     public async Task<List<Reservation>> GetReservationsAsync()
     {
         const string sql = "SELECT r.id,r.campsite_id AS CampsiteId,c.name AS CampsiteName,r.customer_id AS CustomerId,cu.name AS CustomerName,cu.email AS CustomerEmail,r.check_in AS CheckIn,r.check_out AS CheckOut,r.guests,r.total,r.status,r.payment_status AS PaymentStatus,r.payment_method AS PaymentMethod FROM reservations r JOIN campsites c ON c.id=r.campsite_id JOIN customers cu ON cu.id=r.customer_id ORDER BY r.check_in DESC";
@@ -54,7 +54,8 @@ public sealed class CampRepository(NpgsqlDataSource dataSource) : ICampRepositor
     public async Task SaveThemeAsync(ThemeSettings theme) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("INSERT INTO settings(key,value) VALUES ('theme.primary',@Primary),('theme.forest',@Forest),('theme.earth',@Earth),('theme.sand',@Sand),('theme.ember',@Ember) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value", theme); }
     public async Task AddActivityAsync(Activity item) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("INSERT INTO activities(title,description,starts_at,location) VALUES (@Title,@Description,@StartsAt,@Location)", item); }
     public async Task DeleteActivityAsync(int id) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("DELETE FROM activities WHERE id=@id", new { id }); }
-    public async Task AddMenuItemAsync(MenuItem item) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("INSERT INTO menu_items(category,name,description,price,is_available) VALUES (@Category,@Name,@Description,@Price,true)", item); }
+    public async Task AddMenuItemAsync(MenuItem item) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("INSERT INTO menu_items(category,name,description,price,sort_order,is_available) VALUES (@Category,@Name,@Description,@Price,COALESCE(NULLIF(@SortOrder,0),(SELECT COALESCE(MAX(sort_order),0)+10 FROM menu_items)),true)", item); }
+    public async Task UpdateMenuOrderAsync(int id, int sortOrder) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("UPDATE menu_items SET sort_order=@sortOrder WHERE id=@id", new { id, sortOrder }); }
     public async Task DeleteMenuItemAsync(int id) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("DELETE FROM menu_items WHERE id=@id", new { id }); }
     public async Task<(int Id, string Username, string PasswordHash)?> FindAdminAsync(string username) { await using var db = await dataSource.OpenConnectionAsync(); return await db.QuerySingleOrDefaultAsync<(int, string, string)>("SELECT id,username,password_hash FROM app_users WHERE username=@username", new { username }); }
 }
