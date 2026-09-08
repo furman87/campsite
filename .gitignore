@@ -1,0 +1,74 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Aa]rtifacts/
+[Pp]ublish/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# .NET tooling and user-specific files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.DotSettings.user
+*.ncrunchsolution
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.VisualState.xml
+
+# Local environment, secrets, certificates, and logs
+.env
+.env.local
+.env.*.local
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+*.log
+logs/
+
+# Docker runtime overrides and local bind-mount data
+compose.override.yaml
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-data/
+
+# Front-end package/tool caches, if added later
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+dist/
+.cache/
+
+# OS and file-manager noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
+
+# Temporary and backup files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Keep source-controlled dummy/test data, migrations, Docker files,
+# .env.example, and all test fixtures in Git.

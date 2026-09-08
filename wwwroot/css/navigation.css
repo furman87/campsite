@@ -1,0 +1,7 @@
+html { scroll-behavior: smooth; }
+#activities, #menu { scroll-margin-top: 18px; }
+
+@media (max-width: 760px) {
+  nav a:nth-child(2) { display: inline; }
+  nav .visit-link { display: none; }
+}

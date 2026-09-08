@@ -1,0 +1,2 @@
+@{ ViewData["Title"] = "Administrator login"; }
+<section class="login-wrap"><form method="post" class="login-card"><div class="eyebrow">STAFF ONLY</div><h1>Welcome back.</h1><div asp-validation-summary="ModelOnly" class="validation"></div><input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" /><label>Username <input name="username" autocomplete="username" required /></label><label>Password <input name="password" type="password" autocomplete="current-password" required /></label><button class="button ember">Sign in →</button></form></section>

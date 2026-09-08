@@ -1,0 +1,11 @@
+@using Campsite.Data
+@inject ICampRepository Camp
+@{ var theme = await Camp.GetThemeAsync(); }
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>@ViewData["Title"] · Lakeside Campground</title><link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /><link rel="stylesheet" href="~/css/navigation.css" asp-append-version="true" /></head>
+<body style="--primary:@theme.Primary;--forest:@theme.Forest;--earth:@theme.Earth;--sand:@theme.Sand;--ember:@theme.Ember">
+<header class="site-header"><a class="brand" asp-controller="Home" asp-action="Index"><img src="~/campfire-logo.png" alt="Lakeside Campground" /><span>Lakeside <b>Campground</b></span></a><nav><a asp-controller="Booking" asp-action="Search">Book a stay</a><a href="/#activities">Activities</a><a href="/#menu">Menu</a><a class="visit-link" asp-controller="Home" asp-action="Rules">Plan your visit</a>@if (User.Identity?.IsAuthenticated == true) { <a asp-controller="Admin" asp-action="Index">Admin</a> } else { <a asp-controller="Account" asp-action="Login">Admin</a> }</nav></header>
+<main>@RenderBody()</main>
+<footer><div><strong>Lakeside Campground</strong><span>Easy days, bright water, good company.</span></div><div><span>Office: daily, 8 AM–8 PM</span><a href="tel:5550100188">(555) 010-0188</a><a href="mailto:hello@lakesidecampground.example">hello@lakesidecampground.example</a></div></footer>
+@await RenderSectionAsync("Scripts", required: false)
+</body></html>

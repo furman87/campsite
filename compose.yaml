@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      ConnectionStrings__Campground: Host=db;Port=5432;Database=${POSTGRES_DB:-lakeside};Username=${POSTGRES_USER:-lakeside};Password=${POSTGRES_PASSWORD}
+      Admin__Username: ${ADMIN_USERNAME:-admin}
+      Admin__Password: ${ADMIN_PASSWORD}
+      Payments__Currency: ${PAYMENTS_CURRENCY:-USD}
+      Payments__StripeSecretKey: ${STRIPE_SECRET_KEY:-}
+      Payments__PayPalClientId: ${PAYPAL_CLIENT_ID:-}
+      Payments__PayPalClientSecret: ${PAYPAL_CLIENT_SECRET:-}
+      Payments__PayPalBaseUrl: ${PAYPAL_BASE_URL:-https://api-m.sandbox.paypal.com}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lakeside}
+      POSTGRES_USER: ${POSTGRES_USER:-lakeside}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - campground-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lakeside} -d ${POSTGRES_DB:-lakeside}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+volumes:
+  campground-postgres:
