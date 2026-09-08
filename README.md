@@ -34,7 +34,7 @@ Docker and Nginx are assumed to be installed.
    docker compose logs -f app
    ```
 
-   The app initializes its tables and starter data automatically. It is published only on `127.0.0.1:8080`, so public access goes through Nginx.
+   The app initializes its tables and starter data automatically. It is published only on `127.0.0.1:8081`, so public access goes through Nginx.
 
 3. Configure Nginx. Edit `deploy/nginx/lakeside-campground.conf` and replace both `example.com` entries with the real domain, then install it:
 
