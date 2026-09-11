@@ -1,12 +1,26 @@
 html { scroll-behavior: smooth; }
 #activities, #menu { scroll-margin-top: 18px; }
 .admin-help { margin: -4px 0 16px; color: #62665d; font-size: .84rem; }
+.screen-reader-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.menu-reorder-list { margin-top: 16px; border-top: 1px solid var(--line); }
+.menu-reorder-item { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 11px 4px; border-bottom: 1px solid var(--line); background: var(--paper); transition: opacity .15s, background .15s; }
+.menu-reorder-item.is-dragging { opacity: .45; }
+.menu-reorder-item.is-drop-target { background: var(--sand); }
+.drag-handle { color: var(--earth); cursor: grab; font-size: 1.25rem; line-height: 1; user-select: none; text-align: center; }
+.drag-handle:active { cursor: grabbing; }
+.menu-reorder-info { min-width: 0; }
+.menu-reorder-info b, .menu-reorder-info small { display: block; }
+.menu-reorder-info small { color: #777167; font-size: .75rem; }
 .menu-order-form { display: flex; align-items: end; gap: 7px; }
 .menu-order-form label { display: grid; gap: 2px; color: #716b5f; font-size: .65rem; font-weight: 700; text-transform: uppercase; }
 .menu-order-form input { width: 58px; padding: 5px; }
 .order-save { border: 0; background: var(--sand); color: var(--forest); cursor: pointer; font: inherit; padding: 6px 8px; }
+.menu-order-status { min-height: 1.3rem; margin: 8px 0 0; color: var(--earth); font-size: .78rem; }
 
 @media (max-width: 760px) {
   nav a:nth-child(2) { display: inline; }
   nav .visit-link { display: none; }
+  .menu-reorder-item { grid-template-columns: 26px minmax(0, 1fr); gap: 9px; }
+  .menu-reorder-item > form { grid-column: 2; }
+  .menu-order-form { justify-content: flex-start; }
 }

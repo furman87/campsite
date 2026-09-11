@@ -14,6 +14,11 @@ public sealed class AdminController(ICampRepository camp) : Controller
     [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> DeleteActivity(int id) { await camp.DeleteActivityAsync(id); return RedirectToAction(nameof(Index)); }
     [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> AddMenu(MenuItem item) { if (!string.IsNullOrWhiteSpace(item.Name) && item.Price >= 0) await camp.AddMenuItemAsync(item); return RedirectToAction(nameof(Index)); }
     [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> UpdateMenuOrder(int id, int sortOrder) { if (sortOrder > 0) await camp.UpdateMenuOrderAsync(id, sortOrder); return RedirectToAction(nameof(Index)); }
+    [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> ReorderMenu([FromBody] List<MenuOrderUpdate> items)
+    {
+        if (items.Count == 0 || items.Count > 500 || items.Any(x => x.Id <= 0 || x.SortOrder <= 0) || items.Select(x => x.Id).Distinct().Count() != items.Count) return BadRequest();
+        await camp.ReorderMenuAsync(items); return Ok();
+    }
     [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> DeleteMenu(int id) { await camp.DeleteMenuItemAsync(id); return RedirectToAction(nameof(Index)); }
     [HttpPost, ValidateAntiForgeryToken] public async Task<IActionResult> Theme(ThemeSettings theme) { if (new[] { theme.Primary, theme.Forest, theme.Earth, theme.Sand, theme.Ember }.All(x => System.Text.RegularExpressions.Regex.IsMatch(x ?? "", "^#[0-9a-fA-F]{6}$"))) await camp.SaveThemeAsync(theme); return RedirectToAction(nameof(Index)); }
 }

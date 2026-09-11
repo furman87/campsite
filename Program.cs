@@ -7,6 +7,7 @@ using Npgsql;
 var builder = WebApplication.CreateBuilder(args);
 SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 builder.Services.AddControllersWithViews();
+builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
 builder.Services.AddHttpClient();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {

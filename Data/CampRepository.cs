@@ -10,7 +10,7 @@ public interface ICampRepository
     Task<List<Activity>> GetActivitiesAsync(); Task<List<MenuItem>> GetMenuAsync(); Task<List<Reservation>> GetReservationsAsync(); Task<List<Customer>> GetCustomersAsync();
     Task<int> CreateReservationAsync(BookingInput input); Task<Reservation?> GetReservationAsync(int id); Task UpdateReservationStatusAsync(int id, string status);
     Task<(int Customers, decimal PendingRevenue)> GetStatsAsync(); Task<ThemeSettings> GetThemeAsync(); Task SaveThemeAsync(ThemeSettings theme);
-    Task AddActivityAsync(Activity item); Task DeleteActivityAsync(int id); Task AddMenuItemAsync(MenuItem item); Task UpdateMenuOrderAsync(int id, int sortOrder); Task DeleteMenuItemAsync(int id);
+    Task AddActivityAsync(Activity item); Task DeleteActivityAsync(int id); Task AddMenuItemAsync(MenuItem item); Task UpdateMenuOrderAsync(int id, int sortOrder); Task ReorderMenuAsync(IEnumerable<MenuOrderUpdate> items); Task DeleteMenuItemAsync(int id);
     Task<(int Id, string Username, string PasswordHash)?> FindAdminAsync(string username); Task SetPaymentAsync(int reservationId, string method, string status, string? transactionId);
 }
 
@@ -56,6 +56,13 @@ public sealed class CampRepository(NpgsqlDataSource dataSource) : ICampRepositor
     public async Task DeleteActivityAsync(int id) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("DELETE FROM activities WHERE id=@id", new { id }); }
     public async Task AddMenuItemAsync(MenuItem item) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("INSERT INTO menu_items(category,name,description,price,sort_order,is_available) VALUES (@Category,@Name,@Description,@Price,COALESCE(NULLIF(@SortOrder,0),(SELECT COALESCE(MAX(sort_order),0)+10 FROM menu_items)),true)", item); }
     public async Task UpdateMenuOrderAsync(int id, int sortOrder) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("UPDATE menu_items SET sort_order=@sortOrder WHERE id=@id", new { id, sortOrder }); }
+    public async Task ReorderMenuAsync(IEnumerable<MenuOrderUpdate> items)
+    {
+        var orderedItems = items.ToList();
+        await using var db = await dataSource.OpenConnectionAsync(); await using var transaction = await db.BeginTransactionAsync();
+        await db.ExecuteAsync("UPDATE menu_items SET sort_order=@SortOrder WHERE id=@Id", orderedItems, transaction);
+        await transaction.CommitAsync();
+    }
     public async Task DeleteMenuItemAsync(int id) { await using var db = await dataSource.OpenConnectionAsync(); await db.ExecuteAsync("DELETE FROM menu_items WHERE id=@id", new { id }); }
     public async Task<(int Id, string Username, string PasswordHash)?> FindAdminAsync(string username) { await using var db = await dataSource.OpenConnectionAsync(); return await db.QuerySingleOrDefaultAsync<(int, string, string)>("SELECT id,username,password_hash FROM app_users WHERE username=@username", new { username }); }
 }
